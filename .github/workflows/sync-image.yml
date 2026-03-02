@@ -16,7 +16,7 @@ jobs:
           # 从 JSON 中提取 URL (需要安装 jq)
           IMG_URL=$(jq -r '.url' sync_task.json)
           # 生成文件名
-          FILE_NAME="images/img-${{ github.run_number }}.png"
+          FILE_NAME="images/img-${{ github.run_number }}.webp"
           mkdir -p images
           # 使用 curl 下载图片，伪装 User-Agent 绕过防盗链
           curl -L -H "User-Agent: Mozilla/5.0" "$IMG_URL" -o "$FILE_NAME"
