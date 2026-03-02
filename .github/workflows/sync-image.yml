@@ -1,0 +1,30 @@
+name: Sync Cloud Image to Repo
+on:
+  push:
+    paths:
+      - 'sync_task.json' # 当这个 JSON 文件更新时触发
+
+jobs:
+  download-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Download Image from URL
+        run: |
+          # 从 JSON 中提取 URL (需要安装 jq)
+          IMG_URL=$(jq -r '.url' sync_task.json)
+          # 生成文件名
+          FILE_NAME="images/img-${{ github.run_number }}.png"
+          mkdir -p images
+          # 使用 curl 下载图片，伪装 User-Agent 绕过防盗链
+          curl -L -H "User-Agent: Mozilla/5.0" "$IMG_URL" -o "$FILE_NAME"
+          
+      - name: Commit and Push
+        run: |
+          git config --global user.name "ImageBot"
+          git config --global user.email "bot@github.com"
+          git add .
+          git commit -m "Auto-synced image from cloud"
+          git push
